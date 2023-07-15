@@ -163,15 +163,17 @@ const App = () => {
   }, [calculatorData])
 
   return (
-    <div className='background'>
-      <div className="container">
-        <div className="calculator">
-          <Display input={input} output={output} />
-          <Keyboard handleInput={handleInput} />
-        </div>
+    <div className="container">
+      <div className="calculator">
+        <Display input={input} output={output} />
+        <Keyboard handleInput={handleInput} />
       </div>
-      {/* <h1 className="author">JavaScript Calculator by Tony Lim</h1> */}
+      <div className='author'>
+        <h3>JavaScript Calculator by Tony Lim</h3>
+        <a  target="_blank" href="https://github.com/tonylxm/javascript-calculator">Source Code</a>
+      </div>
     </div>
+
   )
 }
 
