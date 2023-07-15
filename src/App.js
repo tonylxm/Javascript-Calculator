@@ -27,7 +27,7 @@ const calcData = [
 ];
 
 const operators = ["AC", "DEL", "/", "*", "+", "-", "="];
-const numbers  = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const Display = ({ input, output }) => (
   <div className="output">
@@ -52,51 +52,85 @@ const Keyboard = ({ handleInput }) => (
 
 const App = () => {
   const [input, setInput] = React.useState("0")
-  const [output, setOutput] = React.useState()
-  const [calculatorData, setCalculatorData] = React.useState()
+  const [output, setOutput] = React.useState("")
+  const [calculatorData, setCalculatorData] = React.useState("")
 
   const handleSubmit = () => {
     const result = eval(calculatorData);
     setInput(`${result}`);
-    setCalculatorData(calculatorData + "=" + `${result}`);
+    setOutput(`${calculatorData}` + "=" + `${result}`);
   }
 
   const handleClear = () => {
     setInput("0");
+    setOutput("")
     setCalculatorData("");
   }
 
-  const handleDelete = () => {}
-  
-  const handleNumbers = (value, last, secondLast) => {
-
-    if (last == 0) {
-      return;
+  const handleDelete = () => {
+    if (calculatorData.length > 1 && input !== 0) {
+      setInput(`${input.slice(0, input.length - 1)}`)
+      setCalculatorData(`${calculatorData.slice(0, calculatorData.length - 1)}`);
     } else {
-      setInput(`${value}`);
-      setCalculatorData(calculatorData + `${value}`);
+      handleClear();
     }
   }
 
-  const dotOperator = () => {}
-
-  const handleOperators = (value, last, secondLast) => {
-    if (last === "=") {
-      setCalculatorData(eval(calculatorData) + `${value}`); 
-    } else {
+  const handleNumbers = (value, lastChar) => {
+    if (!calculatorData.length) {
       setInput(`${value}`);
-      setCalculatorData(calculatorData + `${value}`);
+      setCalculatorData(`${value}`);
+    } else {
+      if (value === 0 && (calculatorData === "0" || input === "0")) {
+        setCalculatorData(`${calculatorData}`);
+      } else {
+        const isLastCharOperator = operators.includes(lastChar);
+        setInput(isLastCharOperator ? `${value}` : `${input}${value}`);
+        setCalculatorData(`${calculatorData}${value}`);
+      }
     }
-      
+  }
+
+  const dotOperator = (lastChar) => {
+    if (!calculatorData.length) {
+      setInput("0.");
+      setCalculatorData("0.");
+    } else {
+      if (operators.includes(lastChar)) {
+        setInput("0.");
+        setCalculatorData(`${calculatorData}0.`);
+      } else {
+        setInput(lastChar === "." || input.includes(".") ? `${input}` : `${input}.`)
+        setCalculatorData(lastChar === "." || input.includes(".") ? `${calculatorData}` : `${calculatorData}.`);
+      }
+    }
+  }
+
+  const handleOperators = (value, lastChar) => {
+    const isLastCharOperator = operators.includes(lastChar);
+
+    if (calculatorData.length) {
+      setInput(`${value}`);
+      const secondLastChar = calculatorData[calculatorData.length - 2];
+      const isSecondLastCharOperator = operators.includes(secondLastChar);
+      if ((isLastCharOperator && value !== "-") || (isLastCharOperator && isSecondLastCharOperator)) {
+        if (isSecondLastCharOperator) {
+          setCalculatorData(`${calculatorData.substring(0, calculatorData.length - 2)}${value}`);
+        } else {
+          setCalculatorData(`${calculatorData.substring(0, calculatorData.length - 1)}${value}`);
+        }
+      } else {
+        setCalculatorData(`${calculatorData}${value}`);
+      }
+    }
   }
 
   const handleInput = (value) => {
     const number = numbers.find((num) => num === value);
     const operator = operators.find((op) => op === value);
-    const last = calculatorData[calculatorData.length - 1];
-    const secondLast = calculatorData[calculatorData.length - 2];
+    const lastChar = calculatorData[calculatorData.length - 1];
 
-    switch(value) {
+    switch (value) {
       case "=":
         handleSubmit();
         break;
@@ -107,13 +141,13 @@ const App = () => {
         handleDelete();
         break;
       case number:
-        handleNumbers(value, last, secondLast);
+        handleNumbers(value, lastChar);
         break;
       case ".":
-        dotOperator(value);
+        dotOperator(lastChar);
         break;
       case operator:
-        handleOperators(value, last, secondLast);
+        handleOperators(value, lastChar);
         break;
       default:
         break;
