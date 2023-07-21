@@ -1,6 +1,7 @@
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
 DEPLOYED using Netlify: https://javascript-calculator-tony-lim.netlify.app/
 
 ## Available Scripts
