@@ -127,8 +127,7 @@ const App = () => {
           setCalculatorData(`${result}${value}`);
         } else {
           setCalculatorData(`${calculatorData}${value}`);
-        }
-          
+        } 
       }
     }
   }
