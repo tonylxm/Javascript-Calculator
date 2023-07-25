@@ -1,6 +1,6 @@
 // AUTHOR: Tony Lim
 // DATE CREATED: 10/07/23
-// LAST MODIFIED: 14/07/23
+// LAST MODIFIED: 25/07/23
 
 import './App.css';
 import React from 'react';
@@ -63,7 +63,6 @@ const App = () => {
 
   const handleClear = () => {
     setInput("0");
-    setOutput("")
     setCalculatorData("");
   }
 
@@ -76,14 +75,15 @@ const App = () => {
     }
   }
 
-  const handleNumbers = (value, lastChar) => {
-    if (!calculatorData.length) {
+  const handleNumbers = (value) => {
+    if (!calculatorData.length || output.includes("=")) {
       setInput(`${value}`);
       setCalculatorData(`${value}`);
     } else {
       if (value === 0 && (calculatorData === "0" || input === "0")) {
         setCalculatorData(`${calculatorData}`);
       } else {
+        const lastChar = calculatorData[calculatorData.length - 1];
         const isLastCharOperator = operators.includes(lastChar);
         setInput(isLastCharOperator ? `${value}` : `${input}${value}`);
         setCalculatorData(`${calculatorData}${value}`);
@@ -91,7 +91,8 @@ const App = () => {
     }
   }
 
-  const dotOperator = (lastChar) => {
+  const dotOperator = () => {
+    const lastChar = calculatorData[calculatorData.length - 1];
     if (!calculatorData.length) {
       setInput("0.");
       setCalculatorData("0.");
@@ -106,21 +107,28 @@ const App = () => {
     }
   }
 
-  const handleOperators = (value, lastChar) => {
+  const handleOperators = (value) => {
+    const lastChar = calculatorData[calculatorData.length - 1];
     const isLastCharOperator = operators.includes(lastChar);
+    const secondLastChar = calculatorData[calculatorData.length - 2];
+    const isSecondLastCharOperator = operators.includes(secondLastChar);
 
-    if (calculatorData.length) {
+    if (calculatorData.length || (value === "-" && lastChar !== "-")) {
       setInput(`${value}`);
-      const secondLastChar = calculatorData[calculatorData.length - 2];
-      const isSecondLastCharOperator = operators.includes(secondLastChar);
-      if ((isLastCharOperator && value !== "-") || (isLastCharOperator && isSecondLastCharOperator)) {
+      if ((isLastCharOperator && value !== "-") || isLastCharOperator && isSecondLastCharOperator) {
         if (isSecondLastCharOperator) {
           setCalculatorData(`${calculatorData.substring(0, calculatorData.length - 2)}${value}`);
         } else {
           setCalculatorData(`${calculatorData.substring(0, calculatorData.length - 1)}${value}`);
         }
       } else {
-        setCalculatorData(`${calculatorData}${value}`);
+        if (output.includes("=")) {
+          const result = eval(calculatorData);
+          setCalculatorData(`${result}${value}`);
+        } else {
+          setCalculatorData(`${calculatorData}${value}`);
+        }
+          
       }
     }
   }
@@ -128,7 +136,6 @@ const App = () => {
   const handleInput = (value) => {
     const number = numbers.find((num) => num === value);
     const operator = operators.find((op) => op === value);
-    const lastChar = calculatorData[calculatorData.length - 1];
 
     switch (value) {
       case "=":
@@ -141,13 +148,13 @@ const App = () => {
         handleDelete();
         break;
       case number:
-        handleNumbers(value, lastChar);
+        handleNumbers(value);
         break;
       case ".":
-        dotOperator(lastChar);
+        dotOperator();
         break;
       case operator:
-        handleOperators(value, lastChar);
+        handleOperators(value);
         break;
       default:
         break;
@@ -173,7 +180,6 @@ const App = () => {
         <a  target="_blank" href="https://github.com/tonylxm/javascript-calculator">Source Code</a>
       </div>
     </div>
-
   )
 }
 
